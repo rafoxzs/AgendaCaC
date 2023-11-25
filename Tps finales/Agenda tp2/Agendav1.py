@@ -1,12 +1,25 @@
+import csv
+
 agenda = {}
+contacts = 'Tps finales/Agenda tp2/agenda.csv'
 
 
 def add_contacto(nombre, telefono, email, direccion):
-    if nombre in agenda:  # verifica si el nombre ya esta en la agenda
+    if nombre in agenda:  # verifica si el nombre ya esta en la agenda tipo de dato , de borra claramente cuando reinicio
         print("el contacto ya se encuentra agendado")
     else:
         agenda[nombre] = {"telefono": telefono,
                           "email": email, "direccion": direccion}
+
+        with open(contacts, 'a', newline='') as archivo_csv:  # lo guarda en la base de datos csv
+
+            escritor_csv = csv.writer(archivo_csv)
+            if archivo_csv.tell() == 0:
+                escritor_csv.writerow(
+                    ["Nombre", "Teléfono", "Email", "Dirección"])
+
+            escritor_csv.writerow([nombre, telefono, email, direccion])
+
         print(f"Contacto '{nombre}' agregado correctamente.")
 
 
@@ -20,21 +33,43 @@ def mod_contacto(nombre, telefono, email, direccion):
 
 
 def elim_contacto(nombre):
-    if nombre in agenda:  # verifica si el nombre ya esta en la agenda
-        del agenda[nombre]
-
-    else:
-        print("el contacto no se encuentra agendado")
+    contactos_actualizados = []
+    encontrado = False
+    with open(contacts, 'r', newline='') as archivo_csv:
+        lector_csv = csv.reader(archivo_csv)
+        # recorre cada fila del archivo CSV
+        for fila in lector_csv:
+            # Si el nombre coincide se encontroo el contact
+            if fila[0] == nombre:
+                encontrado = True
+                continue
+            contactos_actualizados.append(fila)
+    with open(contacts, 'w', newline='') as archivo_csv:
+        escritor_csv = csv.writer(archivo_csv)
+        escritor_csv.writerows(contactos_actualizados)
+    print(f"El contacto '{nombre}' se ah eliminado.")
+    if not encontrado:
+        print(f"El contacto '{nombre}' no se encuentra en la agenda.")
 
 
 def cons_contacto(nombre):
-    if nombre in agenda:
-        print(f"nombre : {nombre}")
-        print(f"Telefono : {agenda[nombre]['telefono']}")
-        print(f"email: {agenda[nombre]['email']}")
-        print(f"Dirección: {agenda[nombre]['direccion']}")
-    else:
-        print("El contacto no existe en la agenda.")
+    encontrado = False
+    with open(contacts, 'r', newline='') as archivo_csv:
+        lector_csv = csv.reader(archivo_csv)
+        # recorre cada fila del archivo CSV
+        for fila in lector_csv:
+            # Si el nombre coincide se encontroo el contact
+            if fila[0] == nombre:
+                telefono = fila[1]
+                email = fila[2]
+                direccion = fila[3]
+                print(f"Contacto:{nombre}")
+                print(f"Teléfono: {telefono}")
+                print(f"Email: {email}")
+                print(f"Dirección: {direccion}")
+                encontrado = True
+    if not encontrado:
+        print(f"El contacto '{nombre}' no se encuentra en la agenda.")
 
 
 def verif_name():
@@ -71,7 +106,7 @@ def main():
         print("3. Eliminar contacto")
         print("4. Consultar contacto")
         print("5. Salir")
-        opcion = int(input("Selecciona una opción: "))
+        opcion = int(input("\nSelecciona una opción: "))
         match opcion:
             case 1:
                 nombre = verif_name()
@@ -106,11 +141,12 @@ if __name__ == "__main__":
 
 
 # to do list
+#    - tenerlo funcionando con un diccionario , sin comprobaciones , menu basico.
 #    - usbirlo a github y empezar a usar control de versionesa  ok
-#    - implementar funciones de comprobacion ok FALTARIA VER COMO HACER PARA QUE DEPENDIENDO SEA EL CASO , AGREGAR O MODIFICAR CAMBIE EL PRINT DE CADA F
+#    - implementar funciones de comprobacion OK YA TA FALTARIA VER COMO HACER PARA QUE DEPENDIENDO SEA EL CASO , AGREGAR O MODIFICAR CAMBIE EL PRINT DE CADA F
 #    - funcion que me muestre todos los contactos agendados
-#    - guardar en archivo
-#    -guardarlos con base de datos
+#    - guardar en archivo  // lo hacemos directamente en CSV .  .dat es una paja para esto
+#
 #    - interfaz grafica
 #
 #
